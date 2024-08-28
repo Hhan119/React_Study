@@ -1,9 +1,20 @@
 
 import App from '../App' 
+import Gallery from '../pages/Gallery'
+import GalleryForm from '../pages/GalleryForm'
+import GalleryDetail from '../pages/GalleryDetail'
 import Home from '../pages/Home'
 import Member from '../pages/Member'
 import MemberForm from '../pages/MemberForm'
 import MemeberUpdateForm from '../pages/MemeberUpdateForm'
+import Post from '../pages/Post'
+import PostForm from '../pages/PostForm'
+import PostUpdateForm from '../pages/PostUpdateForm'
+import KakaoRedirect from '../pages/KakaoRedirect'
+import ProtectedRoute from '../components/ProtectedRoute'
+import CafeForm from '../pages/CafeForm'
+import Cafe from '../pages/Cafe'
+
 
 
 const { createBrowserRouter } = require("react-router-dom")
@@ -14,7 +25,19 @@ const routes = [
     {path:"/", element:<Home/>},
     {path:"/members", element:<Member/>},
     {path:"/members/new", element:<MemberForm/>},
-    {path:"/members/:num/edit", element:<MemeberUpdateForm/>}
+    {path:"/members/:num/edit", element:<MemeberUpdateForm/>},
+    {path:"/gallery", element:<Gallery/>},
+    {path:"/gallery/new", element:<ProtectedRoute><GalleryForm/></ProtectedRoute>},
+    {path:"/gallery/:num", element:<GalleryDetail/>},
+    {path:"/posts", element:<Post/>},
+    {path:"/posts/new", element:<PostForm/>},
+    {path:"/posts/:id/edit", element:<PostUpdateForm/>},
+    {path:"/api/v1/auth/AccessTokencallback", element:<KakaoRedirect/>},
+    {path:"/cafes", element:<Cafe/>},
+    {path:"/cafes/new", element:<ProtectedRoute><CafeForm/></ProtectedRoute>},
+    
+ 
+
 ]
 
 // BreowserRouter 를 만들기
