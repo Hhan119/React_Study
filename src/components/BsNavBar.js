@@ -8,6 +8,7 @@ import axios from 'axios';
 function BsNavBar() {
         // 로그인 된 사용자명이 있는지 store에서 읽어와본다.
         const userName = useSelector(state=>state.userName)
+        const kakaoId = useSelector(state=>state.kakaoId)
         // action을 dispatch 할 수 있는 함수
         const dispatch = useDispatch()
         const navigate = useNavigate()
@@ -30,10 +31,18 @@ function BsNavBar() {
             setAlertShow(false)
         }
 
+        const G_REDIRECT_URL="http://localhost:3000/googleLogin/redirect";
+        const G_CLIENT_ID_API_KEY="813308724720-70o3vscmtc40nt6v9llmj7t96l28k3sp.apps.googleusercontent.com"
+        const googleURL = "https://accounts.google.com/o/oauth2/v2/auth?client_id="+G_CLIENT_ID_API_KEY+"&redirect_uri="+G_REDIRECT_URL+"&response_type=code"+"&scope=email profile";
+
         const K_REST_API_KEY ='ea3fc29935a7e7b17c9a328b221b9488';
-        //const k_REDIRECT_URL ='http://localhost:8888/api/v1/auth/callback';
-        const k_REDIRECT_URL ="http://localhost:3000/api/v1/auth/accesstokencallback";
+        const k_REDIRECT_URL ="http://localhost:3000/kakaoLogin/redirect";
         const kakaoURL = "https://kauth.kakao.com/oauth/authorize?client_id="+K_REST_API_KEY+"&redirect_uri="+k_REDIRECT_URL+"&response_type=code";
+        
+        const handlegoogleLogin = ()=>{
+            window.location= googleURL;
+        }
+
         const handlekakaoLogin = ()=>{
             window.location = kakaoURL;
         }
@@ -50,7 +59,7 @@ function BsNavBar() {
                 return;
               }
               
-              axios.post("/api/v1/auth/kakaologout", {kakaoId}, {
+              axios.post("/api/v1/auth/kakaoLogout", {kakaoId}, {
                 headers: {
                   "Authorization": `Bearer ${authHeader}`,
                   "Content-Type": "application/x-www-form-urlencoded",
@@ -110,17 +119,20 @@ function BsNavBar() {
                             dispatch(action)
                         }}>Sign in</Button> 
                         }
-                        { userName ? 
+                        { kakaoId ? 
                         <>
                             <Nav>
                                 <Nav.Link>{userName}</Nav.Link>
                                 <span className="navbar-text">Signed in </span>
                             </Nav>
                             <Button onClick={handlekakaoLogout}>카카오 로그아웃</Button>
+                            
                         </>
                         :
                         <Button onClick={handlekakaoLogin}>카카오 로그인</Button>
+                        
                         }
+                        <Button onClick={handlekakaoLogout}>카카오 로그아웃</Button>
                         <Button onClick={handlegoogleLogin}>구글 로그인</Button>
                     </Navbar.Collapse>
                 </Container>

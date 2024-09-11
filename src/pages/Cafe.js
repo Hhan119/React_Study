@@ -2,8 +2,8 @@
 
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Table } from "react-bootstrap";
-import { Link, useSearchParams } from "react-router-dom";
+import { Pagination, Table } from "react-bootstrap";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 
 function Cafe() {
@@ -18,6 +18,10 @@ function Cafe() {
     })
     // "cafes/pageNum=x" 에서 pageNum을 추출하기 위한 Hook
     const [params, setParams]=useSearchParams({pageNum:1})
+
+    // 페이징 숫자를 출력할 때 사용하는 배열을 상태값으로 관리 
+    const [pageArray, setPageArray]=useState([])
+
     // 글 목록 데이터 새로 읽어오는 함수 
     const refresh = (pageNum)=>{
         // 검색 기능 관련된 query 문자열 가져오기
@@ -26,7 +30,11 @@ function Cafe() {
         axios.get(`/cafes?pageNum=${pageNum}&${query}`)
         .then(res=>{
             console.log(res.data)
+            // 서버로부터 응답된 데이터를 state로 넣어준다.
             setPageInfo(res.data)
+            // 페이징 처리에 관련된 배열을 만들어서 state로 넣어준다.
+            const result=range(res.data.startPageNum, res.data.endPageNum)
+            setPageArray(result)
         })
         .catch(error=>{
             console.log(error)
@@ -47,6 +55,43 @@ function Cafe() {
             // 해당 페이지의 내용을 원격지 서버로부터 받아온다. 
             refresh(pageNum)
         }, [params])
+
+        // 페이지를 이동할 hook
+        const navigate = useNavigate()
+
+        // 페이징 UI 를 만들때 사용할 배열을 리턴해주는 함수
+        function range(start, end){
+            const result = [];
+            for (let i = start; i<=end; i++) {
+                result.push(i);
+            }
+            return result;
+        }
+
+        // navigate() 함수를 이용해서 페이지를 변경하는 함수
+        const move =(pageNum=1)=>{
+            // 검색조건에 맞는 query 문자열을 얻어내기
+            const query = new URLSearchParams(searchState).toString()
+            navigate(`/cafes?pageNum=${pageNum}&${query}`)
+        }
+        // 검색조건을 변경하거나 검색어를 입력하면 호출되는 함수 
+        const handleSearchChange = (e)=>{
+            setSearchState({
+                ...searchState,
+                [e.target.name]:e.target.value // 검색 조건 or 검색 키워드가 변경된 값을 반영
+            })
+        }
+
+        // Reset 버튼을 눌렀을 때 
+        const handleReset = ()=>{
+            setSearchState({
+                condition:"",
+                keyword:""
+            })
+            // 1 페이지 내용이 보이게
+            move(1)
+        }
+
     return (
         <>
             <Link to="/cafes/new">새글 작성</Link>
@@ -66,6 +111,9 @@ function Cafe() {
                         pageInfo.list.map(item=>(
                             <tr key={item.num}>
                                 <td>{item.num}</td>
+                                <td>
+                                    <Link to={`/cafes/${item.num}?condition=${searchState.condition}&keyword=${searchState.keyword}`}>{item.title}</Link>
+                                </td>
                                 <td>{item.title}</td>
                                 <td>{item.writer}</td>
                                 <td>{item.viewCount}</td>
@@ -75,6 +123,28 @@ function Cafe() {
                     }
                 </tbody>
             </Table>
+            <Pagination className="mt-3">
+                <Pagination.Item onClick={()=>move(pageInfo.startPageNum -1)} disabled={pageInfo.startPageNum === 1}>&laquo;</Pagination.Item>
+                {
+                    pageArray.map(item=>(
+                        <Pagination.Item onClick={()=>move(item)} key={item} active={pageInfo.pageNum === item}>
+                            {item}
+                        </Pagination.Item>
+                    ))
+                }
+                <Pagination.Item onClick={()=>move(pageInfo.endPageNum+1)} disabled={pageInfo.endPageNum >= pageInfo.totalPageCount}>&raquo;</Pagination.Item>
+            </Pagination>
+            <label htmlFor="search">검색조건</label>
+            <select onChange={handleSearchChange} value={searchState.condition} name="condition" id="search">
+                <option value="">선택</option>
+                <option value="title_content">제목+내용</option>
+                <option value="title">제목</option>
+                <option value="writer">작성자</option>
+            </select>
+            <input onChange={handleSearchChange} value={searchState.keyword} type="text" placeholder="검색어..." name="keyword" />
+            <button onClick={()=>move()}>검색</button>
+            <button onClick={handleReset}>Reset</button>
+            <p><strong>{pageInfo.totalRow}</strong> 개의 글이 있습니다</p>
         </>
     );
 }

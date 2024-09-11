@@ -11,10 +11,13 @@ import Post from '../pages/Post'
 import PostForm from '../pages/PostForm'
 import PostUpdateForm from '../pages/PostUpdateForm'
 import KakaoRedirect from '../pages/KakaoRedirect'
+import GoogleRedirect from '../pages/GoogleRedirect'
 import ProtectedRoute from '../components/ProtectedRoute'
 import CafeForm from '../pages/CafeForm'
 import Cafe from '../pages/Cafe'
-
+import CafeDetail from '../pages/CafeDetail'
+import CafeUpdateForm from '../pages/CafeUpdateForm'
+import FileUpload from '../pages/FileUpload'
 
 
 const { createBrowserRouter } = require("react-router-dom")
@@ -32,11 +35,15 @@ const routes = [
     {path:"/posts", element:<Post/>},
     {path:"/posts/new", element:<PostForm/>},
     {path:"/posts/:id/edit", element:<PostUpdateForm/>},
-    {path:"/api/v1/auth/AccessTokencallback", element:<KakaoRedirect/>},
+    {path:"/kakaoLogin/redirect", element:<KakaoRedirect/>},
+    {path:"/googleLogin/redirect", element:<GoogleRedirect/>},
     {path:"/cafes", element:<Cafe/>},
     {path:"/cafes/new", element:<ProtectedRoute><CafeForm/></ProtectedRoute>},
-    
- 
+    {path:"/cafes/:num", element:<CafeDetail/>},
+    {path:"/cafes/:num/edit", element:<ProtectedRoute><CafeUpdateForm/></ProtectedRoute>},
+    {path:"/s3test", element:<FileUpload/>},
+
+
 
 ]
 

@@ -76,6 +76,12 @@ function initEditor(id="content"){ // id 는 textarea 의 아이디
         
 
         try{
+              // <iframe> 을 만들기 전에 이미 만들어 놓은게 있으면 제거한다.
+              const f = document.querySelector("iframe");
+              if(f){
+                  f.remove();
+              }
+              // <iframe> 요소를 만드는 코드
             elIFrame = document.createElement("<iframe frameborder=0 scrolling=no>");
         }catch(e){
             elIFrame = document.createElement("iframe");
@@ -203,6 +209,11 @@ function initEditor(id="content"){ // id 는 textarea 의 아이디
     // SmartEditor 에 입력한 내용을 textarea 에 변환하는 함수 
     oEditors.exec = function(){
         this.getById[id].exec("UPDATE_CONTENTS_FIELD", []);
+    }
+
+     // SmartEditor 에 새로운 내용으로 덮어쓰기
+     oEditors.setContents = function(contents){
+        this.getById[id].setContents(contents);
     }
 
     return oEditors;
